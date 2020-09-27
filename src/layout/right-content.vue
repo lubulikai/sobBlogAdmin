@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div class="content-title-box">右边内容</div>
+    <div class="content-title-box">{{$route.name}}</div>
     <div class="content-container-box">
       <router-view />
     </div>

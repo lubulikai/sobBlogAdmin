@@ -5,7 +5,7 @@ Vue.use(VueRouter);
 
 // const home = () => import("@/components/home");
 // const article = () => import("@/components/article");
-// const login = () => import("@/page/login/login");//登录界面
+const login = () => import("@/page/login/login");//登录界面
 const loop = () => import("@/page/operation/loop");//轮播图配置
 const manageCategory = () => import("@/page/operation/manage-category");//文章分类管理
 const friendLink = () => import("@/page/settings/friend-link");//友情链接管理
@@ -25,7 +25,7 @@ const rightContent = () => import("@/layout/right-content");//右侧内容
 
 export const routes = [
     {
-        path: '/home',
+        path: '',
         component: baseView,
         redirect: '/index',
         children: [
@@ -158,6 +158,11 @@ export const routes = [
                 ]
             }
         ]
+    },
+    {
+        path: "/login",
+        component: login,
+        requireLogin: false
     }
 ];
 

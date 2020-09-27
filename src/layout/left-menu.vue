@@ -37,8 +37,7 @@ export default {
   mounted() {
     let list = routes[0].children;
     this.menuList = list;
-    console.log(this.menuList);
-    console.log(this.$route.path);
+    console.log(this.$route);
   },
 };
 </script>

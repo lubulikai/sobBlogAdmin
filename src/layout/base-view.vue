@@ -10,7 +10,7 @@
         </el-aside>
         <el-container>
           <el-main>
-            <rightContent />
+            <router-view />
           </el-main>
           <el-footer>底部内容</el-footer>
         </el-container>
@@ -22,12 +22,10 @@
 <script>
 import topHeader from "@/layout/top-header";
 import leftMenu from "@/layout/left-menu";
-import rightContent from "@/layout/right-content";
 export default {
   components: {
     leftMenu,
-    topHeader,
-    rightContent,
+    topHeader
   },
   mounted() {
     let headHeight = document.getElementById("base-header").offsetHeight;
