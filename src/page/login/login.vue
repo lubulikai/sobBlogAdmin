@@ -58,7 +58,7 @@
 </template>
 
 <script>
-import { doLogin } from "@/api/app";
+import { doLogin } from "@/api/api";
 export default {
   data() {
     return {
@@ -111,7 +111,7 @@ export default {
     },
     updateVerifyCode() {
       this.captchPath =
-        "http://localhost:2020/user/captcha?captcha_key=" +
+        "http://192.168.63.128:2020/user/captcha?captcha_key=" +
         this.loginInfo.captcha_key +
         "&random=" +
         Date.parse(new Date());

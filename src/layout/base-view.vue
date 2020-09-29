@@ -1,6 +1,6 @@
 <template>
-  <div>
-    <el-container>
+  <div class="base-container-box">
+    <el-container class="base-el-container">
       <el-header id="base-header">
         <topHeader />
       </el-header>
@@ -25,17 +25,21 @@ import leftMenu from "@/layout/left-menu";
 export default {
   components: {
     leftMenu,
-    topHeader
+    topHeader,
   },
-  mounted() {
-    let headHeight = document.getElementById("base-header").offsetHeight;
-    let windowHeight = window.innerHeight;
-    let baseAside = document.getElementById("base-aside");
-    baseAside.style.height = windowHeight - headHeight + "px";
-  },
+  // mounted() {
+  //   let headHeight = document.getElementById("base-header").offsetHeight;
+  //   let windowHeight = window.innerHeight;
+  //   let baseAside = document.getElementById("base-aside");
+  //   baseAside.style.height = windowHeight - headHeight + "px";
+  // },
 };
 </script>
 <style>
+.base-container-box,
+.base-el-container {
+  height: 100%;
+}
 .el-header {
   background-color: dodgerblue;
   line-height: 46px;
@@ -43,6 +47,8 @@ export default {
 }
 #base-aside {
   border-right: solid 1px #e6e6e6;
+  overflow: hidden;
+  height: 100%;
 }
 .el-main {
   padding: 0;

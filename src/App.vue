@@ -10,6 +10,11 @@ export default {
 };
 </script>
 <style>
+html,
+body,
+#app {
+  height: 100%;
+}
 * {
   padding: 0;
   margin: 0;

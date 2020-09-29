@@ -3,7 +3,7 @@ import App from './App.vue'
 import router from './router';
 import 'element-ui/lib/theme-chalk/index.css';
 import elementUi from 'element-ui';
-import { checkToken } from "./api/app";
+import { checkToken,success_code } from "./api/api";
 Vue.config.productionTip = false
 Vue.use(elementUi);
 router.beforeEach((to, from, next) => {
@@ -11,7 +11,7 @@ router.beforeEach((to, from, next) => {
     next();
   } else {
     checkToken().then(result => {
-      if (result.code === 20000) {
+      if (result.code === success_code) {
         if (result.data.roles === "role_admin") {
           next();
         }

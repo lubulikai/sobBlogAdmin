@@ -11,9 +11,9 @@
 export default {};
 </script>
 <style>
-.content-container-box {
+/* .content-container-box {
   padding: 10px;
-}
+} */
 .content-title-box {
   line-height: 46px;
   padding: 5px;
