@@ -83,3 +83,63 @@ export const resetUserPassword = (userId, password) => {
 export const deleteUser = id => {
     return http.requestDelete("api/user/" + id);
 }
+
+//发送邮箱验证码
+export const sendEmailVerifyCode = (email, type) => {
+    return http.requestGet("api/user/verify_code?email=" + email + "&type=" + type);
+}
+
+//更新邮箱
+export const updateEmail = (email, verifyCode) => {
+    return http.requestPut("api/user/email?email=" + email + "&verify_code=" + verifyCode);
+}
+
+//更新用户信息
+export const updateUserInfo = (id, user) => {
+    return http.requestPut("api/user/user_info/" + id, user);
+}
+
+//获取网站title
+export const getWebSizeTitle = () => {
+    return http.requestGet("api/admin/web_size_info/title");
+}
+
+//更新网站title
+export const updateWebSizeInfo = title => {
+    return http.requestPut("api/admin/web_size_info/title?title=" + title);
+}
+
+//获取网站seo信息
+export const getSeoInfo = () => {
+    return http.requestGet("api/admin/web_size_info/seo");
+}
+
+//更新网站seo信息
+export const updateSeoInfo = (description, keywords) => {
+    return http.requestPut("api/admin/web_size_info/seo?description=" + description + "&keywords=" + keywords);
+}
+
+//友情链接列表
+export const listFriendLink = () => {
+    return http.requestGet("api/admin/friend_link/list");
+}
+
+//获取单条友情链接
+export const getFriendLink = id => {
+    return http.requestGet("api/admin/friend_link/" + id);
+}
+
+//添加友情链接
+export const addFriendLink = (friendLink) => {
+    return http.requestPost("api/admin/friend_link", friendLink);
+}
+
+//更新友情链接
+export const updateFriendLink = (id, friendLink) => {
+    return http.requestPut("api/admin/friend_link/" + id, friendLink);
+}
+
+//删除友情链接
+export const deleteFriendLink = id => {
+    return http.requestDelete("api/admin/friend_link/" + id);
+}

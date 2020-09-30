@@ -22,7 +22,7 @@
       <el-table-column prop="imageUrl" label="图片">
         <template slot-scope="scope">
           <el-image
-            style="width: 100px; height: 100px"
+            style="width: 200px;"
             :src="scope.row.imageUrl"
             fit="fill"
           ></el-image>
@@ -44,7 +44,7 @@
         </template>
       </el-table-column>
     </el-table>
-    <el-dialog :title="dialogTitle" :visible.sync="dialogVisible" width="400">
+    <el-dialog :title="dialogTitle" :visible.sync="dialogVisible" width="600px">
       <el-form label-width="80px">
         <el-form-item label="标题" required>
           <el-input
@@ -133,7 +133,7 @@ export default {
       }
     },
     handleAdd() {
-      this.dialogTitle = "添加分类";
+      this.dialogTitle = "添加轮播图";
       this.dialogType = "add";
       this.loopFormData.title = "";
       this.loopFormData.state = "1";
@@ -146,7 +146,7 @@ export default {
       api.getLoop(row.id).then((res) => {
         if (res.code === api.success_code) {
           let data = res.data;
-          this.dialogTitle = "编辑分类";
+          this.dialogTitle = "编辑轮播图";
           this.dialogType = "edit";
           this.loopFormData.id = data.id;
           this.loopFormData.title = data.title;

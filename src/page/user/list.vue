@@ -196,7 +196,6 @@ export default {
 </script>
 <style>
 .search-box {
-  padding-top: 10px;
-  padding-left: 10px;
+  padding-left: 20px;
 }
 </style>

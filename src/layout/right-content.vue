@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div class="content-title-box">{{$route.name}}</div>
+    <div class="content-title-box">{{ $route.name }}</div>
     <div class="content-container-box">
       <router-view />
     </div>
@@ -11,9 +11,9 @@
 export default {};
 </script>
 <style>
-/* .content-container-box {
-  padding: 10px;
-} */
+.content-container-box {
+  padding-top: 20px;
+}
 .content-title-box {
   line-height: 46px;
   padding: 5px;
