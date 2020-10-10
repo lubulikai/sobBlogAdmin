@@ -4,15 +4,14 @@
       <el-header id="base-header">
         <topHeader />
       </el-header>
-      <el-container>
-        <el-aside id="base-aside" width="200px">
+      <el-container class="base-main-container">
+        <el-aside id="base-aside" width="220px">
           <leftMenu />
         </el-aside>
         <el-container>
           <el-main>
             <router-view />
           </el-main>
-          <el-footer>底部内容</el-footer>
         </el-container>
       </el-container>
     </el-container>
@@ -36,9 +35,11 @@ export default {
 };
 </script>
 <style>
-.base-container-box,
-.base-el-container {
-  height: 100%;
+.base-main-container {
+  position: absolute;
+  top: 46px;
+  bottom: 0;
+  width: 100%;
 }
 .el-header {
   background-color: dodgerblue;
@@ -47,8 +48,6 @@ export default {
 }
 #base-aside {
   border-right: solid 1px #e6e6e6;
-  overflow: hidden;
-  height: 100%;
 }
 .el-main {
   padding: 0;

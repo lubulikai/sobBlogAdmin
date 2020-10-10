@@ -2,8 +2,6 @@ import http from './http';
 
 export const success_code = 20000;
 
-export const base_url = "http://192.168.63.128:2020/";
-
 //解析token
 export const checkToken = () => {
     return http.requestGet("api/user/check-token");
@@ -142,4 +140,39 @@ export const updateFriendLink = (id, friendLink) => {
 //删除友情链接
 export const deleteFriendLink = id => {
     return http.requestDelete("api/admin/friend_link/" + id);
+}
+
+//获取图片列表
+export const getListImage = (page, size, original = "") => {
+    return http.requestGet("api/admin/image/list/" + page + "/" + size + "?original=" + original);
+}
+
+//获取文章列表
+export const getListArticle = (page, size, keyword, categoryId, state) => {
+    return http.requestGet("api/admin/article/list/" + page + "/" + size + "?keyword=" + keyword + "&categoryId=" + categoryId + "&state=" + state);
+}
+
+//删除文章
+export const deleteArticleById = id => {
+    return http.requestDelete("api/admin/article/" + id);
+}
+
+//软删除文章
+export const deleteArticleByUpdateState = id => {
+    return http.requestPut("api/admin/article/state/" + id);
+}
+
+//新增文章
+export const addArticle = article => {
+    return http.requestPost("api/admin/article", article);
+}
+
+//置顶文章
+export const topArticle = id => {
+    return http.requestPut("api/admin/article/top/" + id);
+}
+
+//获取文章详情
+export const getArticle = id => {
+    return http.requestGet("api/admin/article/" + id);
 }

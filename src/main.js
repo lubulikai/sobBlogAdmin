@@ -3,8 +3,10 @@ import App from './App.vue'
 import router from './router';
 import 'element-ui/lib/theme-chalk/index.css';
 import elementUi from 'element-ui';
-import { checkToken,success_code } from "./api/api";
-Vue.config.productionTip = false
+import { checkToken, success_code } from "./api/api";
+import constants from "./utils/constants";
+Vue.prototype.$constant = constants;
+Vue.config.productionTip = false;
 Vue.use(elementUi);
 router.beforeEach((to, from, next) => {
   if (to.path === "/login") {

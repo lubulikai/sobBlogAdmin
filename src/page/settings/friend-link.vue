@@ -65,12 +65,7 @@
           ></el-input>
         </el-form-item>
         <el-form-item label="logo图片" required>
-          <el-upload
-            action="api/admin/image"
-            :show-file-list="false"
-            :on-success="onUploadImageSuccess"
-            :before-upload="beforeImageUpload"
-          >
+          <div @click="changeLinkImage">
             <el-image
               class="uploader-image"
               v-if="formData.logo"
@@ -78,19 +73,33 @@
               fit="fill"
             />
             <i v-else class="el-icon-plus uploader-icon"></i>
-          </el-upload>
+          </div>
         </el-form-item>
         <el-form-item>
           <el-button type="primary" @click="submitForm()"> 提交</el-button>
         </el-form-item>
       </el-form>
     </el-dialog>
+    <my-upload
+      field="file"
+      @crop-upload-success="cropUploadSuccess"
+      @crop-upload-fail="cropUploadFail"
+      v-model="uploadShow"
+      :width="300"
+      :height="150"
+      url="api/admin/image/link"
+      img-format="png"
+    />
   </div>
 </template>
 
 <script>
 import * as api from "@/api/api";
+import myUpload from "vue-image-crop-upload";
 export default {
+  components: {
+    myUpload,
+  },
   data() {
     return {
       loading: false,
@@ -107,24 +116,25 @@ export default {
         state: "1",
       },
       commonLoading: null,
+      uploadShow: false,
     };
   },
   methods: {
-    beforeImageUpload(file) {
-      this.commonLoading = this.$loading({
-        lock: true,
-        text: "上传中",
-        spinner: "el-icon-loading",
-      });
-    },
-    onUploadImageSuccess(response, file, fileList) {
-      this.commonLoading.close();
-      if (response.code === api.success_code) {
-        this.formData.logo = api.base_url + "portal/image/" + response.data.id;
-        this.$message.success(response.message);
+    //上传成功
+    cropUploadSuccess(res, field) {
+      if (res.code === api.success_code) {
+        this.formData.logo = this.$constant.base_image_url + res.data.id;
+        this.$message.success(res.message);
       } else {
-        this.$message.error(response.message);
+        this.$message.error(res.message);
       }
+    },
+    //上传失败
+    cropUploadFail(status, field) {
+      this.$message.error("友情链接上传失败");
+    },
+    changeLinkImage() {
+      this.uploadShow = true;
     },
     handleAdd() {
       this.dialogTitle = "添加友情链接";
@@ -234,8 +244,8 @@ export default {
 </script>
 <style>
 .uploader-image {
-  width: 178px;
-  height: 178px;
+  width: 300px;
+  height: 150px;
   border-radius: 4px;
   border: 1px solid #dcdfe6;
 }
@@ -243,9 +253,9 @@ export default {
 .uploader-icon {
   font-size: 28px;
   color: #8c939d;
-  width: 178px;
-  height: 178px;
-  line-height: 178px;
+  width: 300px;
+  height: 150px;
+  line-height: 150px;
   text-align: center;
   border: 1px solid #dcdfe6;
   border-radius: 4px;

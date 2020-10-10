@@ -38,7 +38,7 @@
       v-model="uploadShow"
       :width="300"
       :height="300"
-      url="api/admin/image"
+      url="api/admin/image/avatar"
       img-format="png"
     ></my-upload>
   </div>
@@ -67,7 +67,7 @@ export default {
     //上传成功
     cropUploadSuccess(res, field) {
       if (res.code === api.success_code) {
-        this.userInfo.avatar = api.base_url + "portal/image/" + res.data.id;
+        this.userInfo.avatar = this.$constant.base_image_url + res.data.id;
         this.$message.success(res.message);
       } else {
         this.$message.error(res.message);

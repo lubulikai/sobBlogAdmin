@@ -22,7 +22,7 @@
       <el-table-column prop="imageUrl" label="图片">
         <template slot-scope="scope">
           <el-image
-            style="width: 200px;"
+            style="width: 200px"
             :src="scope.row.imageUrl"
             fit="fill"
           ></el-image>
@@ -72,7 +72,7 @@
         </el-form-item>
         <el-form-item label="上传图片" required>
           <el-upload
-            action="api/admin/image"
+            action="api/admin/image/loop"
             :show-file-list="false"
             :on-success="onUploadImageSuccess"
             :before-upload="beforeImageUpload"
@@ -125,8 +125,7 @@ export default {
     onUploadImageSuccess(response, file, fileList) {
       this.commonLoading.close();
       if (response.code === api.success_code) {
-        this.loopFormData.imageUrl =
-          api.base_url + "portal/image/" + response.data.id;
+        this.loopFormData.imageUrl = this.$constant.base_image_url + response.data.id;
         this.$message.success(response.message);
       } else {
         this.$message.error(response.message);
