@@ -11,10 +11,10 @@
       <el-form-item label="状态">
         <el-select v-model="state" clearable placeholder="请选择状态">
           <el-option label="全部" value="" />
-          <el-option label="已删除" value="0" />
-          <el-option label="已发布" value="1" />
-          <el-option label="草稿" value="2" />
-          <el-option label="置顶" value="3" />
+          <el-option label="已删除" :value="$constant.articleState.delete" />
+          <el-option label="已发布" :value="$constant.articleState.publish" />
+          <el-option label="草稿" :value="$constant.articleState.draft" />
+          <el-option label="置顶" :value="$constant.articleState.top" />
         </el-select>
       </el-form-item>
       <el-form-item label="分类">
@@ -42,10 +42,24 @@
       <el-table-column prop="viewCount" label="浏览量" />
       <el-table-column prop="state" label="状态">
         <template slot-scope="scope">
-          <el-tag v-if="scope.row.state === '0'" type="danger">已删除</el-tag>
-          <el-tag v-if="scope.row.state === '1'">已发布</el-tag>
-          <el-tag v-if="scope.row.state === '2'" type="info">草稿</el-tag>
-          <el-tag v-if="scope.row.state === '3'" type="success">置顶</el-tag>
+          <el-tag
+            v-if="scope.row.state === $constant.articleState.delete"
+            type="danger"
+            >已删除</el-tag
+          >
+          <el-tag v-if="scope.row.state === $constant.articleState.publish"
+            >已发布</el-tag
+          >
+          <el-tag
+            v-if="scope.row.state === $constant.articleState.draft"
+            type="info"
+            >草稿</el-tag
+          >
+          <el-tag
+            v-if="scope.row.state === $constant.articleState.top"
+            type="success"
+            >置顶</el-tag
+          >
         </template>
       </el-table-column>
       <el-table-column prop="type" label="类型">
@@ -65,7 +79,7 @@
             >详情</el-button
           >
           <el-button
-            :disabled="scope.row.status === '0'"
+            :disabled="scope.row.state === $constant.articleState.delete"
             size="mini"
             type="danger"
             @click="handleDelete(scope.$index, scope.row)"
@@ -75,11 +89,29 @@
             size="mini"
             type="success"
             @click="doTop(scope.$index, scope.row)"
-            >{{ scope.row.state === "3" ? "取消置顶" : "置顶" }}</el-button
+            >{{
+              scope.row.state === $constant.articleState.top
+                ? "取消置顶"
+                : "置顶"
+            }}</el-button
           >
         </template>
       </el-table-column>
     </el-table>
+    <el-dialog
+      title="删除文章"
+      :visible.sync="deleteDialogVisible"
+      width="400px"
+    >
+      <div>
+        <i class="el-icon-warning"></i>
+        <span>请选择删除类型</span>
+      </div>
+      <span slot="footer" class="dialog-footer">
+        <el-button type="danger" @click="deleteById">物理删除</el-button>
+        <el-button type="warning" @click="deleteByState">软删除</el-button>
+      </span>
+    </el-dialog>
   </div>
 </template>
 
@@ -98,6 +130,8 @@ export default {
       totalCount: 0,
       categories: [],
       commonLoading: null,
+      deleteDialogVisible: false,
+      deleteArticleId: "",
     };
   },
   methods: {
@@ -108,8 +142,37 @@ export default {
         spinner: "el-icon-loading",
       });
     },
-    showDetail(index, row) {},
-    handleDelete(index, row) {},
+    showDetail(index, row) {
+      this.$router.push({
+        path: "/content/post-article",
+        query: { id: row.id },
+      });
+    },
+    handleDelete(index, row) {
+      this.deleteDialogVisible = true;
+      this.deleteArticleId = row.id;
+    },
+    deleteById() {
+      api.deleteArticleById(this.deleteArticleId).then((res) => {
+        this.deleteDialogVisible = false;
+        if (res.code === api.success_code) {
+          this.$message.success(res.message);
+          this.loadArticleList();
+        } else {
+          this.$message.error(res.message);
+        }
+      });
+    },
+    deleteByState() {
+      api.deleteArticleByUpdateState(this.deleteArticleId).then((res) => {
+        if (res.code === api.success_code) {
+          this.$message.success(res.message);
+          this.loadArticleList();
+        } else {
+          this.$message.error(res.message);
+        }
+      });
+    },
     doTop(index, row) {
       api.topArticle(row.id).then((res) => {
         if (res.code === api.success_code) {

@@ -11,6 +11,7 @@
     <div id="editor">
       <mavon-editor
         @change="contentChange"
+        v-model="article.content"
         ref="mdEditor"
         @onImageClick="showImageDialog('editor')"
       />
@@ -65,13 +66,13 @@
       </el-form-item>
       <el-form-item label="封面" required>
         <div
-          @click="showImageDialog('summary')"
+          @click="showImageDialog('cover')"
           style="display: inline-block; cursor: pointer"
         >
           <el-image
             class="uploader-image"
             v-if="article.cover"
-            :src="article.cover"
+            :src="$constant.base_image_url + article.cover"
             fit="fill"
           />
           <i v-else class="el-icon-plus uploader-icon" />
@@ -80,8 +81,15 @@
     </el-form>
     <el-row class="article-post-bottom-row">
       <el-button @click="preView">全屏预览</el-button>
-      <el-button type="info">保存草稿</el-button>
-      <el-button type="primary">发表文章</el-button>
+      <el-button
+        type="info"
+        @click="doSaveDraft"
+        :disabled="article.state !== $constant.articleState.draft"
+        >保存草稿</el-button
+      >
+      <el-button type="primary" @click="doUpdateOrPublish">{{
+        article.state === $constant.articleState.draft ? "发表文章" : "更新文章"
+      }}</el-button>
     </el-row>
     <el-dialog
       class="article-upload-dialog"
@@ -144,12 +152,18 @@ export default {
   data() {
     return {
       article: {
+        id: "",
         title: "",
         categoryId: "",
         summary: "",
         cover: "",
         label: "",
+        content: "",
+        state: this.$constant.articleState.draft,
+        createTime: null,
+        type: "1",
       },
+      contentHtml: "",
       tags: [],
       isEnough: false,
       categories: [],
@@ -163,15 +177,19 @@ export default {
       totalCount: 10,
       commonLoading: null,
       imageDialogType: "",
+      isSave: false,
     };
   },
   methods: {
-    beforeImageUpload(file) {
+    doLoading() {
       this.commonLoading = this.$loading({
         lock: true,
-        text: "上传中",
+        text: "请等待",
         spinner: "el-icon-loading",
       });
+    },
+    beforeImageUpload(file) {
+      this.doLoading();
     },
     onUploadImageSuccess(response, file, fileList) {
       this.commonLoading.close();
@@ -183,24 +201,109 @@ export default {
         this.$message.error(response.message);
       }
     },
+    //获取标签字符串
+    getlabel() {
+      let tempLabel = "";
+      if (this.tags.length > 0) {
+        this.tags.forEach((item, index) => {
+          tempLabel += item;
+          if (index !== this.tags.length - 1) {
+            tempLabel += "-";
+          }
+        });
+      }
+      return tempLabel;
+    },
+    //点击保存草稿
+    doSaveDraft() {
+      if (this.article.title === "") {
+        this.$message.error("标题不能为空");
+        return;
+      }
+      this.article.state = this.$constant.articleState.draft;
+      this.article.content = this.contentHtml;
+      this.article.label = this.getlabel();
+      this.doLoading();
+      api.addArticle(this.article).then((res) => {
+        window.onbeforeunload = null;
+        this.isSave = true;
+        this.commonLoading.close();
+        if (res.code === api.success_code) {
+          this.$message.success(res.message);
+        } else {
+          this.$message.error(res.message);
+        }
+      });
+    },
+    //发表或者更新文章
+    doUpdateOrPublish() {
+      if (this.article.title === "") {
+        this.$message.error("标题不能为空");
+        return;
+      }
+      if (this.article.content === "") {
+        this.$message.error("文章内容不能为空");
+        return;
+      }
+      if (this.tags.length === 0) {
+        this.$message.error("标签不能为空");
+        return;
+      }
+      if (this.article.categoryId === "") {
+        this.$message.error("文章分类不能为空");
+        return;
+      }
+      if (this.article.summary === "") {
+        this.$message.error("摘要不能为空");
+        return;
+      }
+      this.article.state = this.$constant.articleState.publish;
+      this.article.content = this.contentHtml;
+      this.article.label = this.getlabel();
+      this.doLoading();
+      if (this.article.id) {
+        //更新
+        api.updateArticle(this.article.id, this.article).then((res) => {
+          window.onbeforeunload = null;
+          this.isSave = true;
+          this.commonLoading.close();
+          if (res.code === api.success_code) {
+            this.$message.success(res.message);
+          } else {
+            this.$message.error(res.message);
+          }
+        });
+      } else {
+        //新增
+        api.addArticle(this.article).then((res) => {
+          window.onbeforeunload = null;
+          this.isSave = true;
+          this.commonLoading.close();
+          if (res.code === api.success_code) {
+            this.$message.success(res.message);
+          } else {
+            this.$message.error(res.message);
+          }
+        });
+      }
+    },
     //全屏预览
     preView() {
       this.$refs.mdEditor.toolbar_right_click("read");
     },
     //编辑器内内容变化
     contentChange(value, render) {
-      console.log(value);
-      console.log(render);
+      // console.log(value);
+      this.contentHtml = render;
     },
     //弹出图片选择界面
     showImageDialog(type) {
       this.imageDialogType = type;
-      this.loadListImage();
       this.imageDialogVisible = true;
     },
     //选中图片后确定
     btnSubmitSelectImage() {
-      if (!this.selectImageIndex) {
+      if (this.selectImageIndex == null) {
         this.$message.error("请选择一张图片");
         return;
       }
@@ -211,8 +314,8 @@ export default {
           item.name,
           this.$constant.base_image_url + item.url
         );
-      } else if (this.imageDialogType === "summary") {
-        this.article.summary = this.$constant.base_image_url + item.url;
+      } else if (this.imageDialogType === "cover") {
+        this.article.cover = item.url;
       }
       this.imageDialogVisible = false;
     },
@@ -240,7 +343,7 @@ export default {
     //处理tag的提交
     handleInputTagConfirm() {
       let inputTagValue = this.inputTagValue;
-      if (inputTagValue === null) {
+      if (inputTagValue === null || inputTagValue === "") {
         this.inputTagVisible = false;
         return;
       }
@@ -282,9 +385,63 @@ export default {
       this.currentImagePageIndex = page;
       this.loadListImage();
     },
+    //获取文章详情后回显
+    getArticleDetail() {
+      if (this.$route.query.id) {
+        this.doLoading();
+        //修改文章
+        api.getArticle(this.$route.query.id).then((res) => {
+          this.commonLoading.close();
+          if (res.code === api.success_code) {
+            if (res.data) {
+              let temp = res.data;
+              this.article.id = temp.id;
+              this.article.title = temp.title;
+              this.article.content = temp.content;
+              this.article.categoryId = temp.categoryId;
+              this.article.summary = temp.summary;
+              this.article.cover = temp.cover;
+              this.article.state = temp.state;
+              this.article.type = temp.type;
+              this.article.label = temp.label;
+              this.article.createTime = temp.createTime;
+              this.contentHtml = temp.content;
+              this.tags = temp.labels;
+            }
+          } else {
+            this.$message.error(res.message);
+          }
+        });
+      }
+    },
+  },
+  beforeDestroy() {
+    window.onbeforeunload = null;
+  },
+  beforeRouteLeave(to, from, next) {
+    if (!this.isSave) {
+      this.$confirm("确定要离开吗?", "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning",
+      })
+        .then(() => {
+          next();
+        })
+        .catch(() => {
+          next(false);
+        });
+    } else {
+      next();
+    }
   },
   mounted() {
+    window.onbeforeunload = () => {
+      return "请注意，系统可能不会保存填写的文章信息哦";
+    };
     this.loadArticleType();
+    this.getArticleDetail();
+    this.loadListImage();
   },
 };
 </script>

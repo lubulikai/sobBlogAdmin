@@ -167,6 +167,11 @@ export const addArticle = article => {
     return http.requestPost("api/admin/article", article);
 }
 
+//更新文章
+export const updateArticle = (articleId, article) => {
+    return http.requestPut("api/admin/article/" + articleId, article);
+}
+
 //置顶文章
 export const topArticle = id => {
     return http.requestPut("api/admin/article/top/" + id);
@@ -175,4 +180,19 @@ export const topArticle = id => {
 //获取文章详情
 export const getArticle = id => {
     return http.requestGet("api/admin/article/" + id);
+}
+
+//获取评论列表
+export const getListComment = (page, size) => {
+    return http.requestGet("api/admin/comment/list?page=" + page + "&size=" + size);
+}
+
+//删除评论
+export const deleteCommentById = id => {
+    return http.requestDelete("api/admin/comment/" + id);
+}
+
+//置顶评论
+export const topComment = id => {
+    return http.requestPut("api/admin/comment/top/" + id);
 }
