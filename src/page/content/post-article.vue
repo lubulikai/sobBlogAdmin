@@ -257,12 +257,18 @@ export default {
         this.$message.error("摘要不能为空");
         return;
       }
-      this.article.state = this.$constant.articleState.publish;
+
       this.article.content = this.contentHtml;
       this.article.label = this.getlabel();
       this.doLoading();
       if (this.article.id) {
         //更新
+        if (
+          this.article.state === this.$constant.articleState.delete ||
+          this.article.state === this.$constant.articleState.draft
+        ) {
+          this.article.state = this.$constant.articleState.publish;
+        }
         api.updateArticle(this.article.id, this.article).then((res) => {
           window.onbeforeunload = null;
           this.isSave = true;
@@ -275,6 +281,7 @@ export default {
         });
       } else {
         //新增
+        this.article.state = this.$constant.articleState.publish;
         api.addArticle(this.article).then((res) => {
           window.onbeforeunload = null;
           this.isSave = true;

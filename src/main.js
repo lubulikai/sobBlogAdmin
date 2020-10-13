@@ -14,6 +14,8 @@ router.beforeEach((to, from, next) => {
   } else {
     checkToken().then(result => {
       if (result.code === success_code) {
+        window.localStorage.setItem('avatar',result.data.avatar);
+        window.localStorage.setItem('userName',result.data.userName);
         if (result.data.roles === "role_admin") {
           next();
         }

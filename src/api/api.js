@@ -17,6 +17,11 @@ export const doLogin = (verifyCode, verifyKey, from, user) => {
         from, user);
 }
 
+//退出登录
+export const doLogout=()=>{
+    return http.requestGet("api/user/logout");
+}
+
 //获取分类列表信息
 export const listCategories = () => {
     return http.requestGet("api/admin/category/list");
@@ -147,6 +152,11 @@ export const getListImage = (page, size, original = "") => {
     return http.requestGet("api/admin/image/list/" + page + "/" + size + "?original=" + original);
 }
 
+//软删除图片
+export const deleteImage = id => {
+    return http.requestDelete("api/admin/image/" + id);
+}
+
 //获取文章列表
 export const getListArticle = (page, size, keyword, categoryId, state) => {
     return http.requestGet("api/admin/article/list/" + page + "/" + size + "?keyword=" + keyword + "&categoryId=" + categoryId + "&state=" + state);
@@ -196,3 +206,26 @@ export const deleteCommentById = id => {
 export const topComment = id => {
     return http.requestPut("api/admin/comment/top/" + id);
 }
+
+
+//获取网站访问总量
+export const getWebsizeViewCount = () => {
+    return http.requestGet("api/admin/web_size_info/view_count");
+}
+
+//获取注册用户数量
+export const getRegisterCount = () => {
+    return http.requestGet("api/user/register_count");
+}
+
+//获取文章总数
+export const getArticleCount = () => {
+    return http.requestGet("api/admin/article/count");
+}
+
+//获取评论总数
+export const getCommentCount = () => {
+    return http.requestGet("api/admin/comment/count");
+}
+
+

@@ -98,6 +98,13 @@
         </template>
       </el-table-column>
     </el-table>
+    <el-pagination
+      @current-change="handleCurrentChange"
+      :current-page="currentPageIndex"
+      :page-size="currentPageSize"
+      layout="total, prev, pager, next"
+      :total="totalCount"
+    />
     <el-dialog
       title="删除文章"
       :visible.sync="deleteDialogVisible"
@@ -190,6 +197,7 @@ export default {
     },
     //加载文章列表
     loadArticleList() {
+      this.loading = true;
       api
         .getListArticle(
           this.currentPageIndex,
@@ -199,6 +207,7 @@ export default {
           this.state
         )
         .then((res) => {
+          this.loading = false;
           if (res.code === api.success_code) {
             this.tableData = res.data.contents;
             this.totalCount = res.data.totalCount;
@@ -209,9 +218,7 @@ export default {
     },
     //加载文章分类
     loadCategories() {
-      this.loading = true;
       api.listCategories().then((res) => {
-        this.loading = false;
         if (res.code === api.success_code) {
           this.categories = res.data;
         } else {
@@ -219,6 +226,10 @@ export default {
         }
       });
     },
+    handleCurrentChange(currentPage) {
+      this.currentPageIndex = currentPage;
+      this.loadArticleList();
+    }
   },
   mounted() {
     this.loadArticleList();

@@ -18,6 +18,16 @@
         </template>
       </el-table-column>
       <el-table-column prop="userName" label="用户帐号" />
+      <el-table-column prop="userAvatar" label="用户头像">
+        <template slot-scope="scope">
+          <el-image
+            style="width: 50px; height: 50px"
+            :src="scope.row.userAvatar"
+            fit="fill"
+          ></el-image>
+        </template>
+      </el-table-column>
+
       <el-table-column prop="createTime" label="创建时间" />
       <el-table-column prop="updateTime" label="更新时间" />
       <el-table-column label="操作" width="200" fixed="right">
@@ -41,6 +51,14 @@
         </template>
       </el-table-column>
     </el-table>
+    <el-pagination
+      @current-change="handleCurrentChange"
+      :current-page="currentPageIndex"
+      :page-size="currentPageSize"
+      background
+      layout="total, prev, pager, next"
+      :total="totalCount"
+    />
   </div>
 </template>
 
@@ -57,17 +75,49 @@ export default {
     };
   },
   methods: {
-    loadTableData() {
-      this.loading = true;
-      api.getListComment(this.currentPageIndex,this.currentPageSize).then((res) => {
+    handleDelete(index, row) {
+      this.$confirm("确定要删除吗?", "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning",
+      }).then(() => {
+        api.deleteCommentById(row.id).then((res) => {
+          if (res.code === api.success_code) {
+            this.$message.success(res.message);
+            this.loadTableData();
+          } else {
+            this.$message.error(res.message);
+          }
+        });
+      });
+    },
+    doTop(index, row) {
+      api.topComment(row.id).then((res) => {
         if (res.code === api.success_code) {
-          this.loading = false;
-          this.tableData = res.data.content;
-          this.totalCount = res.data.totalCount;
+          this.$message.success(res.message);
+          this.loadTableData();
         } else {
           this.$message.error(res.message);
         }
       });
+    },
+    loadTableData() {
+      this.loading = true;
+      api
+        .getListComment(this.currentPageIndex, this.currentPageSize)
+        .then((res) => {
+          this.loading = false;
+          if (res.code === api.success_code) {
+            this.tableData = res.data.content;
+            this.totalCount = res.data.totalElements;
+          } else {
+            this.$message.error(res.message);
+          }
+        });
+    },
+    handleCurrentChange(currentPage) {
+      this.currentPageIndex = currentPage;
+      this.loadTableData();
     },
   },
   mounted() {
