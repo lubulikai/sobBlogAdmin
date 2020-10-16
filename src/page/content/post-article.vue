@@ -88,7 +88,7 @@
         >保存草稿</el-button
       >
       <el-button type="primary" @click="doUpdateOrPublish">{{
-        article.state === $constant.articleState.draft ? "发表文章" : "更新文章"
+        article.state === $constant.articleState.draft ? '发表文章' : '更新文章'
       }}</el-button>
     </el-row>
     <el-dialog
@@ -142,9 +142,9 @@
 </template>
 
 <script>
-import * as api from "@/api/api";
-import "../../../lib/mavon-editor/css/index.css";
-import { mavonEditor } from "../../../lib/mavon-editor/mavon-editor.js";
+import * as api from '@/api/api'
+import '../../../lib/mavon-editor/css/index.css'
+import { mavonEditor } from '../../../lib/mavon-editor/mavon-editor.js'
 export default {
   components: {
     mavonEditor,
@@ -152,23 +152,23 @@ export default {
   data() {
     return {
       article: {
-        id: "",
-        title: "",
-        categoryId: "",
-        summary: "",
-        cover: "",
-        label: "",
-        content: "",
+        id: '',
+        title: '',
+        categoryId: '',
+        summary: '',
+        cover: '',
+        label: '',
+        content: '',
         state: this.$constant.articleState.draft,
         createTime: null,
-        type: "1",
+        type: '1',
       },
-      contentHtml: "",
+      contentHtml: '',
       tags: [],
       isEnough: false,
       categories: [],
       inputTagVisible: false,
-      inputTagValue: "",
+      inputTagValue: '',
       imageDialogVisible: false,
       selectImageIndex: null,
       listImage: [],
@@ -176,281 +176,283 @@ export default {
       currentImagePageSize: 20,
       totalCount: 10,
       commonLoading: null,
-      imageDialogType: "",
+      imageDialogType: '',
       isSave: false,
-    };
+    }
   },
   methods: {
     doLoading() {
       this.commonLoading = this.$loading({
         lock: true,
-        text: "请等待",
-        spinner: "el-icon-loading",
-      });
+        text: '请等待',
+        spinner: 'el-icon-loading',
+      })
     },
     beforeImageUpload(file) {
-      this.doLoading();
+      this.doLoading()
     },
     onUploadImageSuccess(response, file, fileList) {
-      this.commonLoading.close();
+      this.commonLoading.close()
       if (response.code === api.success_code) {
-        this.$message.success(response.message);
-        this.currentImagePageIndex = 1;
-        this.loadListImage();
+        this.$message.success(response.message)
+        this.currentImagePageIndex = 1
+        this.loadListImage()
       } else {
-        this.$message.error(response.message);
+        this.$message.error(response.message)
       }
     },
     //获取标签字符串
     getlabel() {
-      let tempLabel = "";
+      let tempLabel = ''
       if (this.tags.length > 0) {
         this.tags.forEach((item, index) => {
-          tempLabel += item;
+          tempLabel += item
           if (index !== this.tags.length - 1) {
-            tempLabel += "-";
+            tempLabel += '-'
           }
-        });
+        })
       }
-      return tempLabel;
+      return tempLabel
     },
     //点击保存草稿
     doSaveDraft() {
-      if (this.article.title === "") {
-        this.$message.error("标题不能为空");
-        return;
+      if (this.article.title === '') {
+        this.$message.error('标题不能为空')
+        return
       }
-      this.article.state = this.$constant.articleState.draft;
-      this.article.content = this.contentHtml;
-      this.article.label = this.getlabel();
-      this.doLoading();
+      this.article.state = this.$constant.articleState.draft
+      this.article.content = this.contentHtml
+      this.article.label = this.getlabel()
+      this.doLoading()
       api.addArticle(this.article).then((res) => {
-        window.onbeforeunload = null;
-        this.isSave = true;
-        this.commonLoading.close();
+        this.commonLoading.close()
         if (res.code === api.success_code) {
-          this.$message.success(res.message);
+          this.$message.success(res.message)
+          this.articlePostSuccessed()
         } else {
-          this.$message.error(res.message);
+          this.$message.error(res.message)
         }
-      });
+      })
     },
     //发表或者更新文章
     doUpdateOrPublish() {
-      if (this.article.title === "") {
-        this.$message.error("标题不能为空");
-        return;
+      if (this.article.title === '') {
+        this.$message.error('标题不能为空')
+        return
       }
-      if (this.article.content === "") {
-        this.$message.error("文章内容不能为空");
-        return;
+      if (this.article.content === '') {
+        this.$message.error('文章内容不能为空')
+        return
       }
       if (this.tags.length === 0) {
-        this.$message.error("标签不能为空");
-        return;
+        this.$message.error('标签不能为空')
+        return
       }
-      if (this.article.categoryId === "") {
-        this.$message.error("文章分类不能为空");
-        return;
+      if (this.article.categoryId === '') {
+        this.$message.error('文章分类不能为空')
+        return
       }
-      if (this.article.summary === "") {
-        this.$message.error("摘要不能为空");
-        return;
+      if (this.article.summary === '') {
+        this.$message.error('摘要不能为空')
+        return
       }
 
-      this.article.content = this.contentHtml;
-      this.article.label = this.getlabel();
-      this.doLoading();
+      this.article.content = this.contentHtml
+      this.article.label = this.getlabel()
+      this.doLoading()
       if (this.article.id) {
         //更新
         if (
           this.article.state === this.$constant.articleState.delete ||
           this.article.state === this.$constant.articleState.draft
         ) {
-          this.article.state = this.$constant.articleState.publish;
+          this.article.state = this.$constant.articleState.publish
         }
         api.updateArticle(this.article.id, this.article).then((res) => {
-          window.onbeforeunload = null;
-          this.isSave = true;
-          this.commonLoading.close();
+          this.commonLoading.close()
           if (res.code === api.success_code) {
-            this.$message.success(res.message);
+            this.$message.success(res.message)
+            this.articlePostSuccessed()
           } else {
-            this.$message.error(res.message);
+            this.$message.error(res.message)
           }
-        });
+        })
       } else {
         //新增
-        this.article.state = this.$constant.articleState.publish;
+        this.article.state = this.$constant.articleState.publish
         api.addArticle(this.article).then((res) => {
-          window.onbeforeunload = null;
-          this.isSave = true;
-          this.commonLoading.close();
+          this.commonLoading.close()
           if (res.code === api.success_code) {
-            this.$message.success(res.message);
+            this.$message.success(res.message)
+            this.articlePostSuccessed()
           } else {
-            this.$message.error(res.message);
+            this.$message.error(res.message)
           }
-        });
+        })
       }
+    },
+    articlePostSuccessed() {
+      window.onbeforeunload = null
+      this.isSave = true
+      this.$router.push('/content/manage-article')
     },
     //全屏预览
     preView() {
-      this.$refs.mdEditor.toolbar_right_click("read");
+      this.$refs.mdEditor.toolbar_right_click('read')
     },
     //编辑器内内容变化
     contentChange(value, render) {
       // console.log(value);
-      this.contentHtml = render;
+      this.contentHtml = render
     },
     //弹出图片选择界面
     showImageDialog(type) {
-      this.imageDialogType = type;
-      this.imageDialogVisible = true;
+      this.imageDialogType = type
+      this.imageDialogVisible = true
     },
     //选中图片后确定
     btnSubmitSelectImage() {
       if (this.selectImageIndex == null) {
-        this.$message.error("请选择一张图片");
-        return;
+        this.$message.error('请选择一张图片')
+        return
       }
-      let item = this.listImage[this.selectImageIndex];
-      if (this.imageDialogType === "editor") {
+      let item = this.listImage[this.selectImageIndex]
+      if (this.imageDialogType === 'editor') {
         this.$refs.mdEditor.toolbar_left_addlink(
-          "no-link",
+          'no-link',
           item.name,
           this.$constant.base_image_url + item.url
-        );
-      } else if (this.imageDialogType === "cover") {
-        this.article.cover = item.url;
+        )
+      } else if (this.imageDialogType === 'cover') {
+        this.article.cover = item.url
       }
-      this.imageDialogVisible = false;
+      this.imageDialogVisible = false
     },
     //删除tag
     handleCloseTag(tag) {
-      this.tags.splice(this.tags.indexOf(tag), 1);
+      this.tags.splice(this.tags.indexOf(tag), 1)
       if (this.tags.length < 5) {
-        this.inputTagVisible = false;
-        this.isEnough = false;
+        this.inputTagVisible = false
+        this.isEnough = false
       }
     },
     //展示添加tag的input
     showInputTag() {
       if (this.tags.length < 5) {
-        this.inputTagVisible = true;
-        this.isEnough = false;
+        this.inputTagVisible = true
+        this.isEnough = false
         this.$nextTick((_) => {
-          this.$refs.saveTagInput.$refs.input.focus();
-        });
+          this.$refs.saveTagInput.$refs.input.focus()
+        })
       } else {
-        this.inputTagVisible = false;
-        this.isEnough = true;
+        this.inputTagVisible = false
+        this.isEnough = true
       }
     },
     //处理tag的提交
     handleInputTagConfirm() {
-      let inputTagValue = this.inputTagValue;
-      if (inputTagValue === null || inputTagValue === "") {
-        this.inputTagVisible = false;
-        return;
+      let inputTagValue = this.inputTagValue
+      if (inputTagValue === null || inputTagValue === '') {
+        this.inputTagVisible = false
+        return
       }
       if (this.tags.length < 5) {
-        this.tags.push(inputTagValue);
-        this.inputTagValue = "";
-        this.inputTagVisible = false;
+        this.tags.push(inputTagValue)
+        this.inputTagValue = ''
+        this.inputTagVisible = false
       }
       if (this.tags.length >= 5) {
-        this.isEnough = true;
-        this.inputTagVisible = false;
+        this.isEnough = true
+        this.inputTagVisible = false
       }
     },
     //加载文章分类
     loadArticleType() {
       api.listCategories().then((res) => {
         if (res.code === api.success_code) {
-          this.categories = res.data;
+          this.categories = res.data
         } else {
-          this.$message.error(res.message);
+          this.$message.error(res.message)
         }
-      });
+      })
     },
     //加载图片列表
     loadListImage() {
       api
-        .getListImage(this.currentImagePageIndex, this.currentImagePageSize, "")
+        .getListImage(this.currentImagePageIndex, this.currentImagePageSize, '')
         .then((res) => {
           if (res.code === api.success_code) {
-            this.listImage = res.data.content;
-            this.totalCount = res.data.totalElements;
+            this.listImage = res.data.content
+            this.totalCount = res.data.totalElements
           } else {
-            this.$message.error(res.message);
+            this.$message.error(res.message)
           }
-        });
+        })
     },
     //当前页变更
     currentChange(page) {
-      this.currentImagePageIndex = page;
-      this.loadListImage();
+      this.currentImagePageIndex = page
+      this.loadListImage()
     },
     //获取文章详情后回显
     getArticleDetail() {
       if (this.$route.query.id) {
-        this.doLoading();
+        this.doLoading()
         //修改文章
         api.getArticle(this.$route.query.id).then((res) => {
-          this.commonLoading.close();
+          this.commonLoading.close()
           if (res.code === api.success_code) {
             if (res.data) {
-              let temp = res.data;
-              this.article.id = temp.id;
-              this.article.title = temp.title;
-              this.article.content = temp.content;
-              this.article.categoryId = temp.categoryId;
-              this.article.summary = temp.summary;
-              this.article.cover = temp.cover;
-              this.article.state = temp.state;
-              this.article.type = temp.type;
-              this.article.label = temp.label;
-              this.article.createTime = temp.createTime;
-              this.contentHtml = temp.content;
-              this.tags = temp.labels;
+              let temp = res.data
+              this.article.id = temp.id
+              this.article.title = temp.title
+              this.article.content = temp.content
+              this.article.categoryId = temp.categoryId
+              this.article.summary = temp.summary
+              this.article.cover = temp.cover
+              this.article.state = temp.state
+              this.article.type = temp.type
+              this.article.label = temp.label
+              this.article.createTime = temp.createTime
+              this.contentHtml = temp.content
+              this.tags = temp.labels
             }
           } else {
-            this.$message.error(res.message);
+            this.$message.error(res.message)
           }
-        });
+        })
       }
     },
   },
   beforeDestroy() {
-    window.onbeforeunload = null;
+    window.onbeforeunload = null
   },
   beforeRouteLeave(to, from, next) {
     if (!this.isSave) {
-      this.$confirm("确定要离开吗?", "提示", {
-        confirmButtonText: "确定",
-        cancelButtonText: "取消",
-        type: "warning",
+      this.$confirm('确定要离开吗?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning',
       })
         .then(() => {
-          next();
+          next()
         })
         .catch(() => {
-          next(false);
-        });
+          next(false)
+        })
     } else {
-      next();
+      next()
     }
   },
   mounted() {
     window.onbeforeunload = () => {
-      return "请注意，系统可能不会保存填写的文章信息哦";
-    };
-    this.loadArticleType();
-    this.getArticleDetail();
-    this.loadListImage();
+      return '请注意，系统可能不会保存填写的文章信息哦'
+    }
+    this.loadArticleType()
+    this.getArticleDetail()
+    this.loadListImage()
   },
-};
+}
 </script>
 <style>
 .article-upload-dialog .el-dialog__header {
